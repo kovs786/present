@@ -1,0 +1,14 @@
+import requests
+import pandas as pd
+
+url = "https://api.spacexdata.com/v4/launches/past"
+
+response = requests.get(url)
+
+if response.status_code == 200:
+    launches = response.json()
+    df = pd.json_normalize(launches)
+    print(df.head())
+    print("Number of records:", len(df))
+else:
+    print("API request failed:", response.status_code)
