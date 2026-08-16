@@ -1,0 +1,79 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# URL of the webpage to scrape
+url = "https://en.wikipedia.org/wiki/List_of_SpaceX_launches"
+
+# Send HTTP GET request
+response = requests.get(url)
+
+# Check whether the request was successful
+print("Status Code:", response.status_code)
+# Parse the webpage using Beautiful Soup
+soup = BeautifulSoup(response.text, "html.parser")
+
+# Display the webpage title
+print("Page Title:", soup.title.get_text(strip=True))
+# Find all tables on the webpage
+tables = soup.find_all("table")
+
+print("Number of tables found:", len(tables))
+# Read tables from the webpage
+web_tables = pd.read_html(url)
+
+# Display the number of tables detected
+print("Number of tables extracted:", len(web_tables))
+
+# Display the first table
+df = web_tables[0]
+
+df.head()
+# Display dataset dimensions
+print("Rows:", df.shape[0])
+print("Columns:", df.shape[1])
+
+# Display column names
+print("\nColumn names:")
+print(df.columns.tolist())
+
+# Display first five records
+df.head()
+
+# Remove completely empty rows and columns
+df = df.dropna(how="all")
+df = df.dropna(axis=1, how="all")
+
+# Remove duplicate rows
+df = df.drop_duplicates()
+
+# Reset the index
+df = df.reset_index(drop=True)
+
+print("Dataset after cleaning:")
+df.head()
+
+# Check missing values in each column
+missing_values = df.isnull().sum()
+
+print("Missing values:")
+print(missing_values)
+
+# Save the cleaned dataset as a CSV file
+df.to_csv("spacex_web_scraped_data.csv", index=False)
+
+print("Web scraping completed successfully.")
+print("Dataset saved as: spacex_web_scraped_data.csv")
+
+print("========== WEB SCRAPING OUTCOME ==========")
+print("Source:", url)
+print("HTTP Status:", response.status_code)
+print("Records collected:", len(df))
+print("Number of columns:", len(df.columns))
+
+print("\nFirst 5 records:")
+display(df.head())
+
+print("\nMissing values:")
+display(df.isnull().sum())
+
