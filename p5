@@ -1,0 +1,50 @@
+import pandas as pd
+import sqlite3
+import matplotlib.pyplot as plt
+
+# Load the cleaned dataset
+df = pd.read_csv("../data/spacex_cleaned_data.csv")
+
+# Display the first five rows
+display(df.head())
+
+# Display dataset dimensions
+print("Number of rows:", df.shape[0])
+print("Number of columns:", df.shape[1])
+
+# Display column names
+print("Column names:")
+for column in df.columns:
+    print(column)
+
+# Display data types
+print("\nData types:")
+print(df.dtypes)
+
+# Check missing values
+print("\nMissing values:")
+display(df.isnull().sum())
+
+# Create an in-memory SQLite database
+connection = sqlite3.connect(":memory:")
+
+# Store the Pandas DataFrame as a SQL table
+df.to_sql(
+    "spacex",
+    connection,
+    if_exists="replace",
+    index=False
+)
+
+print("SpaceX dataset successfully loaded into SQLite.")
+
+query = """
+SELECT *
+FROM spacex
+LIMIT 10;
+"""
+
+result = pd.read_sql_query(query, connection)
+
+display(result)
+
