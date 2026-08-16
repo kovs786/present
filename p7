@@ -1,0 +1,70 @@
+import pandas as pd
+import plotly.express as px
+from dash import Dash, dcc, html, Input, Output
+
+# Load dataset
+df = pd.read_csv("../data/spacex_cleaned_data.csv")
+
+# Convert date column
+df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+
+# Create year column
+df["Year"] = df["Date"].dt.year
+
+# Create Dash application
+app = Dash(__name__)
+
+# Get launch sites
+launch_sites = sorted(df["Launch Site"].dropna().unique())
+
+# Dashboard layout
+app.layout = html.Div([
+    
+    html.H1(
+        "SpaceX Launch Analysis Dashboard",
+        style={"textAlign": "center"}
+    ),
+
+    html.Div([
+        html.Label("Select Launch Site:"),
+
+        dcc.Dropdown(
+            id="launch-site-dropdown",
+            options=[
+                {"label": site, "value": site}
+                for site in launch_sites
+            ],
+            value="All",
+            clearable=False
+        )
+    ]),
+
+    html.Br(),
+
+    html.Div([
+        html.Label("Select Launch Outcome:"),
+
+        dcc.Dropdown(
+            id="outcome-dropdown",
+            options=[
+                {"label": "All", "value": "All"},
+                {"label": "Successful", "value": 1},
+                {"label": "Unsuccessful", "value": 0}
+            ],
+            value="All",
+            clearable=False
+        )
+    ]),
+
+    html.Br(),
+
+    dcc.Graph(id="launches-by-year"),
+
+    dcc.Graph(id="launches-by-site"),
+
+    dcc.Graph(id="launch-outcome"),
+
+    dcc.Graph(id="payload-distribution"),
+
+    dcc.Graph(id="payload-flight-scatter")
+])
