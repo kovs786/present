@@ -1,0 +1,32 @@
+import pandas as pd
+
+# Load the raw dataset
+df = pd.read_csv("spacex_raw_data.csv")
+
+# Inspect the dataset
+print("Dataset shape:", df.shape)
+print("\nData types:")
+print(df.dtypes)
+
+print("\nMissing values:")
+print(df.isnull().sum())
+
+# Remove duplicate records
+df = df.drop_duplicates()
+
+# Remove columns that are not required for analysis
+columns_to_drop = ["unnecessary_column"]
+df = df.drop(columns=columns_to_drop, errors="ignore")
+
+# Convert date column to datetime
+df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+# Handle missing values
+df["category"] = df["category"].fillna("Unknown")
+
+# Reset index
+df = df.reset_index(drop=True)
+
+# Check the cleaned dataset
+print("Cleaned dataset shape:", df.shape)
+display(df.head())
